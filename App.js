@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, ScrollView, StatusBar, Animated, Easing } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import SplashScreen from './SplashScreen';
 
 const FOLDERS = ['personal notes', 'feelings', 'morning pages', 'great ideas'];
 const FILTERS = ['filters', 'important', 'to-do', 'favorites'];
@@ -34,6 +35,7 @@ export default function App() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
   const noteScaleAnim = useRef(new Animated.Value(1)).current;
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     loadFolders();
@@ -417,7 +419,7 @@ export default function App() {
         ]}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => setCurrentScreenWithAnimation('folders')} style={styles.backButton}>
+          <TouchableOpacity onPress={() => setCurrentScreen('folders')} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={theme.text} />
           </TouchableOpacity>
           <Text style={[styles.title, { color: theme.text }]}>{currentFolder}</Text>
@@ -605,12 +607,22 @@ export default function App() {
     </Animated.View>
   );
 
+  const handleContinue = () => {
+    setShowSplash(false);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
-      {currentScreen === 'folders' && renderFolderScreen()}
-      {currentScreen === 'notes' && renderNotesScreen()}
-      {currentScreen === 'noteDetail' && renderNoteDetailScreen()}
+      {showSplash ? (
+        <SplashScreen onContinue={handleContinue} />
+      ) : (
+        <>
+          {currentScreen === 'folders' && renderFolderScreen()}
+          {currentScreen === 'notes' && renderNotesScreen()}
+          {currentScreen === 'noteDetail' && renderNoteDetailScreen()}
+        </>
+      )}
     </SafeAreaView>
   );
 }
